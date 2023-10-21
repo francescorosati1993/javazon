@@ -1,5 +1,6 @@
 import React from "react"
 import 'bootstrap/dist/css/bootstrap.css';
+import '../App.css';
 
 class Navbar extends React.Component {
 

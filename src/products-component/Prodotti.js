@@ -26,7 +26,7 @@ class Prodotti extends React.Component
         return (
 
             <div className="d-flex flex-wrap justify-content-center">
-                 {this.state.prodotti.map(prodotto => <div className="m-3"> <Prodotto key={prodotto.id} prod={prodotto}></Prodotto></div>)}
+                 {this.state.prodotti.map(prodotto => <div className="m-3"> <Prodotto key={prodotto.id} prod={prodotto} addToCart={this.props.addToCart}></Prodotto></div>)}
             </div>
 
         );

@@ -4,6 +4,7 @@ import Navbar from "./navbar/Navbar";
 import Prodotti from "./products-component/Prodotti";
 import $ from "jquery";
 import SpecificFilter from "./filter-component/SpecificFilter";
+import Carrello from "./carrello-component/Carrello";
 
 class App extends React.Component
 {
@@ -13,7 +14,6 @@ class App extends React.Component
         {
             const maxP = this.MaxPrice(data);
             this.setState({loaded:true, prodotti:data, maxP:maxP, priceRange:[0,maxP]}); 
-            console.log(data)
         });
     }
 
@@ -31,13 +31,21 @@ class App extends React.Component
                         loaded:false,
                         search: '',
                         categories: [],
-                        prodotti:[]
+                        prodotti:[],
+                        nuoviProdotti:[],
+                        username:'',
+                        user:[]
                     };
 
         this.handleSearchChange = this.handleSearchChange.bind(this);
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.handlePriceRangeChange = this.handlePriceRangeChange.bind(this);
 
+    }
+
+    notificaIdCarrello = (idCarrello) => 
+    {
+        this.setState({idOrdine: idCarrello});
     }
 
     //Prende le categorie direttamente dai prodotti
@@ -52,7 +60,6 @@ class App extends React.Component
     handleSearchChange(event) 
     {
         this.setState({ search: event.target.value });
-        console.log("Valore di ricerca:", this.state.search);
     }
 
     handleCategoryChange(category) 
@@ -87,6 +94,65 @@ class App extends React.Component
     }
     
 
+    addToCart=(idProdotto) =>
+    { 
+        var settings = {
+            "url": "ordini/"+ this.state.idOrdine +"/prodotti/" + idProdotto,
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+            "Content-Type": "application/json"
+            }
+          };
+          
+        $.ajax(settings).done((response) => {
+            this.setState({nuoviProdotti: response});
+        }).fail(()=>this.setState({error:true})); 
+    }
+
+    removeToCart = (idProdotto) =>
+    { 
+        var settings = {
+            "url": "ordini/"+ this.state.idOrdine +"/prodotti/" + idProdotto,
+            "method": "DELETE",
+            "timeout": 0,
+            "headers": {
+            "Content-Type": "application/json"
+            }
+          };
+          
+          $.ajax(settings).done( (response) => {
+            this.setState({nuoviProdotti: response});
+            
+          }).fail(()=>this.setState({error:true}));
+    }
+
+    handleChange = (e) =>
+    {
+        let username = e.target.value;
+        this.setState({username: username});
+    }
+
+    handleSubmit = (e) =>
+    {
+        e.preventDefault();
+
+        var settings = {
+            "url": "/clienti/"+this.state.username,
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+            "Content-Type": "application/json"
+            }
+        };
+        
+        $.ajax(settings).done(response => {
+            this.setState({user: response});
+        });
+
+    }
+
+
     render()
     {
         if(!this.state.loaded)
@@ -112,7 +178,6 @@ class App extends React.Component
             return true;
         });
 
-        console.log(filteredProducts);
 
 
         return (
@@ -120,7 +185,15 @@ class App extends React.Component
             <div>
               <Navbar search={search} handleSearchChange={this.handleSearchChange} />
                 <div className="row m-5">
-                    <div className="col-3">
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <input type="text" name="username" placeholder="Inserisci Username" onChange={this.handleChange}/>
+                            <input type="submit" value="Accedi" />
+                        </form>
+                    </div>
+
+                    <div>Benvenuto {this.state.user.nome} {this.state.user.cognome}</div>
+                    <div  className="col-3 border border-dark rounded">
                         <SpecificFilter 
                             categories={this.state.categories} 
                             handleCategoryChange={this.handleCategoryChange} 
@@ -132,7 +205,11 @@ class App extends React.Component
                         </SpecificFilter>
                     </div>
                     <div className="col-6 bg-body-tertiary">
-                        <Prodotti key={prodotti} prodotti={filteredProducts}></Prodotti>
+                        <Prodotti prodotti={filteredProducts} addToCart={this.addToCart}></Prodotti>
+                    </div>
+
+                    <div className="col-3 border border-dark rounded">
+                        <Carrello addToCart={this.addToCart} removeToCart={this.removeToCart} nuoviProdotti={this.state.nuoviProdotti} user = {this.state.user} notificaIdCarrello={this.notificaIdCarrello}></Carrello>
                     </div>
                 </div>
     
