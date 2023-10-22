@@ -12,7 +12,7 @@ class Carrello extends React.Component
             loaded: false, 
             prodotti:[],
             nuoviProdotti: [],
-            nuovaListaProdotti: [],
+            nuovaListaProdotti: props.nuoviProdotti,
             ordineInviato: false
         };
  
@@ -30,12 +30,21 @@ class Carrello extends React.Component
                 this.props.notificaIdCarrello(data.id);
             });
 
-            this.setState({ordineInviato:false})
+            this.setState({ordineInviato:false});
         }
 
-        if (prevProps.nuoviProdotti !== this.props.nuoviProdotti) 
+        if (prevProps.aggiunto !== this.props.aggiunto) 
         {
             this.setState({loaded: true, nuovaListaProdotti: this.props.nuoviProdotti});
+            
+            this.props.aggiuntoFalse();
+        }
+
+        if (prevProps.rimosso !== this.props.rimosso) 
+        {
+            this.setState({loaded: true, nuovaListaProdotti: this.props.nuoviProdotti});
+            
+            this.props.rimossoFalse();
         }
     }
 

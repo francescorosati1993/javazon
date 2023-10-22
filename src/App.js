@@ -32,6 +32,8 @@ class App extends React.Component
                         search: '',
                         categories: [],
                         prodotti:[],
+                        aggiunto: false,
+                        rimosso: false,
                         nuoviProdotti:[],
                         username:'',
                         user:[]
@@ -41,6 +43,17 @@ class App extends React.Component
         this.handleCategoryChange = this.handleCategoryChange.bind(this);
         this.handlePriceRangeChange = this.handlePriceRangeChange.bind(this);
 
+    }
+
+    aggiuntoFalse = () =>
+    {
+        this.setState({aggiunto:false});
+    }
+
+    
+    rimossoFalse = () =>
+    {
+        this.setState({rimosso:false});
     }
 
     notificaIdCarrello = (idCarrello) => 
@@ -106,7 +119,7 @@ class App extends React.Component
           };
           
         $.ajax(settings).done((response) => {
-            this.setState({nuoviProdotti: response});
+            this.setState({aggiunto: true, nuoviProdotti: response});
         }).fail(()=>this.setState({error:true})); 
     }
 
@@ -122,7 +135,7 @@ class App extends React.Component
           };
           
           $.ajax(settings).done( (response) => {
-            this.setState({nuoviProdotti: response});
+            this.setState({rimosso: true, nuoviProdotti: response});
             
           }).fail(()=>this.setState({error:true}));
     }
@@ -209,7 +222,7 @@ class App extends React.Component
                     </div>
 
                     <div className="col-3 border border-dark rounded">
-                        <Carrello addToCart={this.addToCart} removeToCart={this.removeToCart} nuoviProdotti={this.state.nuoviProdotti} user = {this.state.user} notificaIdCarrello={this.notificaIdCarrello}></Carrello>
+                        <Carrello addToCart={this.addToCart} removeToCart={this.removeToCart} nuoviProdotti={this.state.nuoviProdotti} user = {this.state.user} notificaIdCarrello={this.notificaIdCarrello} aggiunto={this.state.aggiunto} aggiuntoFalse={this.aggiuntoFalse} rimosso={this.state.rimosso} rimossoFalse={this.rimossoFalse}></Carrello>
                     </div>
                 </div>
     

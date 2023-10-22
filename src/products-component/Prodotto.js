@@ -8,6 +8,14 @@ class Prodotto extends React.Component {
         this.state={pProdotti: props.prod, pCarrello: props.proprieta };
     }
 
+    componentDidUpdate(prevProps) 
+    {
+        if (prevProps.proprieta !== this.props.proprieta) 
+        {
+            this.setState({pCarrello: this.props.proprieta});
+        }
+    }
+
 
     render() {
 
