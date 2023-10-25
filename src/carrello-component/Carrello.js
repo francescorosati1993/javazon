@@ -79,6 +79,9 @@ class Carrello extends React.Component
           
         $.ajax(settings).done((response) => {
             this.setState({ordineInviato: true})
+            
+            this.props.notificaAcquisto(this.state.ordine);
+
         }).fail(()=>this.setState({error:true})); 
     }
 
@@ -101,7 +104,7 @@ class Carrello extends React.Component
                 <div>
                 <h1 className="text-center">Carrello</h1>
                 <h2>Prodotti:</h2>
-                {nuovaListaProdotti.map(prodotto => <Prodotto carrello={true} ordineId={this.state.ordine.id} proprieta={prodotto} addToCart={this.props.addToCart} removeToCart={this.props.removeToCart} ></Prodotto>)}
+                {nuovaListaProdotti.map(prodotto => <Prodotto key={prodotto.id} carrello={true} ordineId={this.state.ordine.id} proprieta={prodotto} addToCart={this.props.addToCart} removeToCart={this.props.removeToCart} ></Prodotto>)}
                 </div>
                 <div className="mt-5">
                     <button className="btn btn-success" onClick={this.acquista}>Acquista</button>

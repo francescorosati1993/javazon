@@ -5,16 +5,31 @@ import Prodotti from "./products-component/Prodotti";
 import $ from "jquery";
 import SpecificFilter from "./filter-component/SpecificFilter";
 import Carrello from "./carrello-component/Carrello";
+import Ordini from "./ordini-component/Ordini";
 
 class App extends React.Component
 {
     componentDidMount()
     {
+        if(localStorage.getItem('token'))
+            $.ajaxSetup({
+                headers:{"Authorization":"Bearer "+localStorage.getItem('token')}
+            }); 
+        //imposto(allego) il token alla request leggendolo da db interno al browser
+
         $.getJSON("prodotti", (data) => 
         {
             const maxP = this.MaxPrice(data);
             this.setState({loaded:true, prodotti:data, maxP:maxP, priceRange:[0,maxP]}); 
-        });
+        }).fail(() =>  {this.setState({needLogin:true});  $.ajaxSetup({
+            headers:{"Authorization":""}
+        }); });
+
+        //leggete anche il CLIENTE, tanto avete lo username in localstorage
+        //Fate funzionare il sito in generale
+        //aggiungete un pulsantino di LOGOUT, che deve cancellare da localstorage token e username
+        //e refreshare la pagina
+        
     }
 
     MaxPrice(p) 
@@ -28,6 +43,7 @@ class App extends React.Component
     {
         super(props);
         this.state = {  
+                        tempCredentials:{},
                         loaded:false,
                         search: '',
                         categories: [],
@@ -35,8 +51,8 @@ class App extends React.Component
                         aggiunto: false,
                         rimosso: false,
                         nuoviProdotti:[],
-                        username:'',
-                        user:[]
+                        user:[],
+                        ordini:[]
                     };
 
         this.handleSearchChange = this.handleSearchChange.bind(this);
@@ -142,32 +158,69 @@ class App extends React.Component
 
     handleChange = (e) =>
     {
-        let username = e.target.value;
-        this.setState({username: username});
+        let tempCredentials = this.state.tempCredentials;
+        tempCredentials[e.target.name] = e.target.value;
+        this.setState({tempCredentials: tempCredentials});
     }
 
     handleSubmit = (e) =>
     {
+        // let buongiorno = new Audio("/buongiorno.mp3");
+
+        // buongiorno.play();
+        
+        // for(let i=0; i<10; i++)
+        // setTimeout(() => {buongiorno.play()}, i*1500);
+
         e.preventDefault();
 
         var settings = {
-            "url": "/clienti/"+this.state.username,
+            "url": "http://localhost:8080/authenticate",
             "method": "POST",
             "timeout": 0,
+            "data": JSON.stringify(this.state.tempCredentials),
             "headers": {
             "Content-Type": "application/json"
             }
         };
         
-        $.ajax(settings).done(response => {
-            this.setState({user: response});
-        });
+        $.ajax(settings).done(responseConToken => {
+            //come response riceviamo il TOKEN
+            localStorage.setItem("token",responseConToken.token);
+            localStorage.setItem("username",this.state.tempCredentials.username);
+            window.location.reload();//come se l'utente cliccasse su aggiorna
+            // this.setState({user: response});
+            // $.getJSON("clienti/"+ response.id, (data) => 
+            // {
+            //     this.setState({ordini: data.ordini}); 
+            // });
+        })
+    }
 
+    notificaAcquisto = (ordine) =>
+    {
+        this.setState({ordini: [...this.state.ordini, ordine]});
     }
 
 
     render()
     {
+        if(this.state.needLogin)
+            return (
+                <div>
+                    <div>
+                        <form onSubmit={this.handleSubmit}>
+                            <input type="text" name="username" placeholder="Inserisci Username" onChange={this.handleChange}/>
+                            <input type="text" name="password" placeholder="Inserisci password" onChange={this.handleChange}/>
+                            <input type="submit" value="Accedi" />
+                        </form>
+                    </div>
+
+
+
+                </div>
+            );
+
         if(!this.state.loaded)
         return (<div></div>);
 
@@ -196,15 +249,9 @@ class App extends React.Component
         return (
 
             <div>
-              <Navbar search={search} handleSearchChange={this.handleSearchChange} />
+              <Navbar search={search} handleSearchChange={this.handleSearchChange}  />
                 <div className="row m-5">
-                    <div>
-                        <form onSubmit={this.handleSubmit}>
-                            <input type="text" name="username" placeholder="Inserisci Username" onChange={this.handleChange}/>
-                            <input type="submit" value="Accedi" />
-                        </form>
-                    </div>
-
+                    
                     <div>Benvenuto {this.state.user.nome} {this.state.user.cognome}</div>
                     <div  className="col-3 border border-dark rounded">
                         <SpecificFilter 
@@ -222,10 +269,10 @@ class App extends React.Component
                     </div>
 
                     <div className="col-3 border border-dark rounded">
-                        <Carrello addToCart={this.addToCart} removeToCart={this.removeToCart} nuoviProdotti={this.state.nuoviProdotti} user = {this.state.user} notificaIdCarrello={this.notificaIdCarrello} aggiunto={this.state.aggiunto} aggiuntoFalse={this.aggiuntoFalse} rimosso={this.state.rimosso} rimossoFalse={this.rimossoFalse}></Carrello>
+                        <Carrello addToCart={this.addToCart} removeToCart={this.removeToCart} nuoviProdotti={this.state.nuoviProdotti} user = {this.state.user} notificaIdCarrello={this.notificaIdCarrello} aggiunto={this.state.aggiunto} aggiuntoFalse={this.aggiuntoFalse} rimosso={this.state.rimosso} rimossoFalse={this.rimossoFalse} notificaAcquisto={this.notificaAcquisto}></Carrello>
                     </div>
                 </div>
-    
+                <Ordini ordini={this.state.ordini}></Ordini>
             </div>
         );
 

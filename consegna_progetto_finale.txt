@@ -1,0 +1,150 @@
+Progetto E-Commerce
+
+NomeProgetto: javazon
+
+Il backend sarà del tutto simile a quello di real_estate
+Dovrà offrire API REST (Get,Post,Put,Delete) su Cliente,Prodotto,Ordine
+
+							DUMB JOIN TABLE
+Cliente 1 -- N Ordine 1 -- N Prodotto_To_Ordine N -- 1 Prodotto
+
+
+Entità:
+
+Cliente
+id: Integer autogenerato
+username: String UNIVOCA (fatela in formato mail) (studiate da soli, googlate, come fare REGEXP di una mail per il controllo)
+nome,cognome: String
+indirizzo: String COMPLETO, via+città
+Lista di ordini
+
+
+Ordine
+id: Integer autogenerato
+dataAcquisto: DateTime
+costoSpedizione: Double
+spedito: boolean
+il Cliente
+lista di Prodotti
+la classe deve avere un metodo getPrezzo() 
+che sommi i prezzi di tutti i prodotti+ la spedizione
+
+Prodotto
+id: Integer autogenerato
+nome: String         
+tipologia: String
+descrizione: String
+url_foto: String
+prezzo: Double
+attivo: boolean
+Lista di ordini
+
+Dovrete anche fare i DTO, ma quelli li farete specifici quando fare front-end
+DTO Cliente senza Ordini
+DTO Cliente con OrdiniDTO(senza padre)
+
+DTO Ordine senza Prodotti, ma con il prezzo totale
+DTO Ordine con ProdottiDTO(senza padre)
+
+DTO Prodotto senza Ordini
+DTO Prodotto con OrdiniDTO(senza padri)
+
+Package model.entities con le entità
+Package model.dto.nomeEntità per ogni entità
+Fate un DTO ASTRATTO per ogni entità, da estendere in quelli concreti
+
+Voglio 3 controller, con i metodi di CRUD
+
+Non fateli a raffica, partite da 1, fate il primo metodo, lo testate
+fate il secondo metodo, lo testate
+Test in 2 parti: prova con POSTMAN, test formale nella cartella apposita
+
+
+MAPPATURE CHE VOGLIO: 
+TUTTE LE MAPPATURE INIZIANO CON /api/ , guardate il requestMapping sul Controller
+
+- Cliente
+  GET clienti -> TUTTI I CLIENTI
+  GET clienti/{id} -> 1 tramite id
+  GET clienti/{username}/username -> 1 tramite username
+  
+  POST clienti -> Inserire 1 solo Cliente
+  PUT clienti/{id} -> modificare cliente con quell'id
+  Delete clienti/{id} -> cancellare cliente con quell'id, MANTENERE GLI ORDINI
+	CREATE CON ID 1 nel DB un cliente STRAWMAN, con username "CLIENTI_CANCELLATI"
+	fate in modo, o tramite Java o tramite SQL, che quando un cliente viene cancellato tutti
+	i suoi ordini vengono assegnati a questo utente
+	
+- Ordine
+  GET ordini -> TUTTI I ordini
+  GET ordini/{id} -> 1 tramite id
+  
+  
+  POST ordini -> Inserire 1 solo ordine
+  PUT ordini/{id} -> modificare ordine con quell'id
+  Delete ordini/{id} -> cancellare ordine con quell'id
+  
+- Ordine
+  GET ordini -> TUTTI I ordini
+  GET ordini/{id} -> 1 tramite id
+  
+  
+  POST ordini -> Inserire 1 solo ordine
+  PUT ordini/{id} -> modificare ordine con quell'id
+  Delete ordini/{id} -> cancellare ordine con quell'id
+  
+  //sto aggiungendo un prodotto al carrello
+  POST ordini/{idOrdine}/prodotti/{idProdotto} - > aggiunge il prodotto con
+				quell'id all'ordine con quell'id
+  Delete ordini/{idOrdine}/prodotti/{idProdotto} -> come sopra, ma lo toglie
+
+
+- Prodotti
+  GET prodotti -> TUTTI I prodotti
+  GET prodotti/{id} -> 1 tramite id
+  
+  
+  POST prodotti -> Inserire 1 solo prodotto
+  PUT prodotti/{id} -> modificare prodotto con quell'id
+  Delete prodotti/{id} ->I prodotti non possono essere cancellati.	
+						Con il delete semplicemente impostate la proprietà
+						attivo a false
+						
+						
+						
+Riepilogo stumenti utilizzati:
+DB in MySQL
+Backend ->  SPRING BOOT è la base, 
+			SPRING-BOOT-WEB vi offre i restController
+			SPRING-DATA-JPA vi offre le repository
+			SPRING-BOOT-TEST-SUIT per i test
+			Postman per le prove
+			
+			
+Procedura:
+
+- Creare database (stesso nome progetto) con le varie tabelle, ecc..
+- Creare progetto spring, iniziare dalle Entità (con le repository), poi DTO poi controller
+
+Fate una cartella su DRIVE condivisa
+- NEL MENTRE producete questa documentazione:
+
+- PRIMA DI INIZIARE: Class Diagram  (come è fatto il nostro DB) -> https://www.tutorialspoint.com/uml/images/uml_class_diagram.jpg
+
+- Sopra ogni entità e DTO -> JAVADOC con breve spiegazione SEMANTICA (cosa è, cosa rappresenta)
+
+- PRIMA DI SCRIVERE IL CORPO DI OGNI METODO NON BANALE: JAVADOC con rapida spiegazione di cosa prende, cosa fa, cosa restuisce
+
+- PRIMA DI SCRIVERE OGNI METODO DEI CONTROLLER: Javadoc con possibili status della response, es: 200 (ho trovato), 403 (no, ha figli), 400 (i dati erano errati)
+
+- SOPRA ogni METODO DI TEST: Javadoc con Input -> Output previsto
+	es: entra Prodotto non valido, voglio response con status 400
+	    entra prodotto buono, voglio response con status 200
+		
+		
+- Lunedì vi faccio vedere come scrivere un FUM (final user manual)
+
+
+Integer 
+DateTime 
+BoT

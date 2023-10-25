@@ -4,9 +4,6 @@ import Prodotto from "./Prodotto";
 
 class Prodotti extends React.Component
 {
-    
-    
-
     constructor(props)
     {
         super(props);
@@ -26,7 +23,7 @@ class Prodotti extends React.Component
         return (
 
             <div className="d-flex flex-wrap justify-content-center">
-                 {this.state.prodotti.map(prodotto => <div className="m-3"> <Prodotto key={prodotto.id} prod={prodotto} addToCart={this.props.addToCart}></Prodotto></div>)}
+                 {this.state.prodotti.map(prodotto => <div key={prodotto.id} className="m-3"> <Prodotto key={prodotto.id} prod={prodotto} addToCart={this.props.addToCart}/></div>)}
             </div>
 
         );
